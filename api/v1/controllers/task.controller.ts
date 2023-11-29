@@ -73,10 +73,12 @@ export const detail = async (req: Request, res: Response) => {
 // [PATCH] /api/v1/tasks/change-status/:id
 export const changeStatus = async (req, res) => {
   try {
+    const listStatus = ["initial", "doing", "notFinish", "finish", "pending"];
     type StatusType =  "initial" | "doing" | "notFinish"|"pending"| "finish";
     const id:string = req.params.id;
     const status:StatusType = req.body.status;
-      await Task.updateOne(
+     if(listStatus.includes(status)){
+       await Task.updateOne(
         {
           _id: id,
         },
@@ -88,6 +90,13 @@ export const changeStatus = async (req, res) => {
         code: 200,
         message: "Cập nhật trạng thái thành công",
       });
+     }else{
+       res.json({
+        code: 400,
+        message: "Cập nhật trạng thái không thành công",
+        error : "Sai format status"
+      });
+     }
   } catch (error) {
     res.json({
       code: 400,
