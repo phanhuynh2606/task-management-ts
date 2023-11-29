@@ -149,7 +149,7 @@ export const create = async (req: Request, res: Response) => {
 
     const task = new Task(req.body);
     const data = await task.save();
-    
+
     res.json({
       code: 200,
       message: "Tạo thành công",
@@ -159,6 +159,23 @@ export const create = async (req: Request, res: Response) => {
     res.json({
       code: 400,
       message: "Tạo không thành công",
+    });
+  }
+};
+
+// [PATCH] /api/v1/tasks/edit/:id
+export const edit = async (req: Request, res: Response) => {
+  try {
+    const id:string = req.params.id;
+    await Task.updateOne({ _id: id }, req.body);
+    res.json({
+      code: 200,
+      message: "Cập nhật thành công",
+    });
+  } catch (error) {
+    res.json({
+      code: 400,
+      message: "Cập nhật không thành công",
     });
   }
 };
