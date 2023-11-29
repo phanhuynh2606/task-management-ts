@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import Task from "../models/task.model";
 import { paginationHelper } from "../../../helper/pagination";
 import { SearchHelper } from "../../../helper/search";
+import { type } from "os";
 
 export const index = async (req: Request, res: Response) => {
   // FIND
@@ -65,6 +66,32 @@ export const detail = async (req: Request, res: Response) => {
     res.json({
       code: 404,
       message: "Lỗi",
+    });
+  }
+};
+
+// [PATCH] /api/v1/tasks/change-status/:id
+export const changeStatus = async (req, res) => {
+  try {
+    type StatusType =  "initial" | "doing" | "notFinish"|"pending"| "finish";
+    const id:string = req.params.id;
+    const status:StatusType = req.body.status;
+      await Task.updateOne(
+        {
+          _id: id,
+        },
+        {
+          status: status,
+        }
+      );
+      res.json({
+        code: 200,
+        message: "Cập nhật trạng thái thành công",
+      });
+  } catch (error) {
+    res.json({
+      code: 400,
+      message: "Cập nhật trạng thái không thành công",
     });
   }
 };
