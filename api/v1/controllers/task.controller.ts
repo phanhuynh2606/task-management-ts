@@ -71,14 +71,14 @@ export const detail = async (req: Request, res: Response) => {
 };
 
 // [PATCH] /api/v1/tasks/change-status/:id
-export const changeStatus = async (req, res) => {
+export const changeStatus = async (req: Request, res: Response) => {
   try {
     const listStatus = ["initial", "doing", "notFinish", "finish", "pending"];
-    type StatusType =  "initial" | "doing" | "notFinish"|"pending"| "finish";
-    const id:string = req.params.id;
-    const status:StatusType = req.body.status;
-     if(listStatus.includes(status)){
-       await Task.updateOne(
+    type StatusType = "initial" | "doing" | "notFinish" | "pending" | "finish";
+    const id: string = req.params.id;
+    const status: StatusType = req.body.status;
+    if (listStatus.includes(status)) {
+      await Task.updateOne(
         {
           _id: id,
         },
@@ -90,13 +90,51 @@ export const changeStatus = async (req, res) => {
         code: 200,
         message: "Cập nhật trạng thái thành công",
       });
-     }else{
-       res.json({
+    } else {
+      res.json({
         code: 400,
         message: "Cập nhật trạng thái không thành công",
-        error : "Sai format status"
+        error: "Sai format status",
       });
-     }
+    }
+  } catch (error) {
+    res.json({
+      code: 400,
+      message: "Cập nhật trạng thái không thành công",
+    });
+  }
+};
+
+// [PATCH] /api/v1/tasks/change-multi
+export const changeMulti = async (req: Request, res: Response) => {
+  try {
+    const ids :string[] = req.body.ids;
+    const key : string = req.body.key;
+    const value : string = req.body.value
+
+    switch (key) {
+      case "status":
+        await Task.updateMany({ _id: { $in: ids } }, { status: value });
+        res.json({
+          code: 200,
+          message: "Cập nhật trạng thái thành công",
+        });
+        break;
+      case "deleted":
+        await Task.updateMany({ _id: { $in: ids } }, { deleted: true, deleteAt: new Date() });
+        res.json({
+          code: 200,
+          message: "Xoá thành công",
+        });
+        break;
+
+      default:
+        res.json({
+          code: 400,
+          message: "Cập nhật trạng thái không thành công",
+        });
+        break;
+    }
   } catch (error) {
     res.json({
       code: 400,
