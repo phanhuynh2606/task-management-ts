@@ -3,7 +3,7 @@ import User from "../models/user.model";
 import md5 from "md5";
 import { generateRandomString } from "../../../helper/generate";
 // [POST] /api/v1/users/register
-export const register = async (req:Request, res:Response) => {
+export const register = async (req: Request, res: Response) => {
   const existEmail = await User.findOne({
     email: req.body.email,
     deleted: false,
@@ -29,6 +29,39 @@ export const register = async (req:Request, res:Response) => {
   res.json({
     code: 200,
     message: "Đăng kí thành công",
+    token: token,
+  });
+};
+
+// [POST] /api/v1/users/login
+export const login = async (req: Request, res: Response) => {
+  const email = req.body.email;
+  const password = req.body.password;
+
+  const user = await User.findOne({
+    email: email,
+    deleted: false,
+  });
+  if (!user) {
+    res.json({
+      code: 400,
+      message: "Email không tồn tại",
+    });
+    return;
+  }
+  if (md5(password) != user.password) {
+    res.json({
+      code: 400,
+      message: "Sai mật khẩu",
+    });
+    return;
+  }
+  const token = user.token;
+  res.cookie("token", token);
+  // res.status(400).json();
+  res.json({
+    code: 200,
+    message: "Đăng nhập thành công",
     token: token,
   });
 };
