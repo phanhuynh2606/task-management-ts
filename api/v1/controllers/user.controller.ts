@@ -65,3 +65,19 @@ export const login = async (req: Request, res: Response) => {
     token: token,
   });
 };
+
+// [GET] /api/v1/users/detail
+export const detail = async (req: Request, res: Response) => {
+ try {
+   res.json({
+     code: 200,
+     message: "Detail profile",
+     info: req["infoUser"],
+   });
+ } catch (error) {
+   res.json({
+     code: 400,
+     message: "Error",
+   });
+ }
+};
